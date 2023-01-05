@@ -44,13 +44,13 @@ void select(string sql){
 
 }
 
-// 修改表
-void alter(string sql){
+// 修改数据
+void update(string sql){
 
 }
 
-// 修改数据
-void update(string sql){
+// 修改表
+void alter(string sql){
 
 }
 
@@ -58,12 +58,15 @@ int main(){
     string sql_command;
     while (cin >> sql_command){
         if(sql_command == "exit") break;
-        if(sql_command.substr(0, 5) == "create")
-        if(sql_command.substr(0, 5) == "insert")
-        if(sql_command.substr(0, 5) == "delete")
-        if(sql_command.substr(0, 5) == "select")
-        if(sql_command.substr(0, 5) == "update")
-        if(sql_command.substr(0, 4) == "alter")
-
+        if(validate(sql_command)) {
+            cout << "SQL语法错误, 请重新输入! ";
+            continue;
+        }
+        if(sql_command.substr(0, 5) == "create") create(sql_command);
+        if(sql_command.substr(0, 5) == "insert") insert(sql_command);
+        if(sql_command.substr(0, 5) == "delete") sql_delete(sql_command);
+        if(sql_command.substr(0, 5) == "select") select(sql_command);
+        if(sql_command.substr(0, 5) == "update") update(sql_command);
+        if(sql_command.substr(0, 4) == "alter") alter(sql_command);
     }
 }
