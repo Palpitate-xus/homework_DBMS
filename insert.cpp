@@ -34,15 +34,7 @@ bool validate(string sql){
         else
             return false;
     }
-    string sql_command_list = {
-        "create",
-        "select",
-        "insert",
-        "update",
-        "alter",
-        "grant",
-        "delete"
-        };  // 合法的命令集合
+
     return st.empty();
 }
 
