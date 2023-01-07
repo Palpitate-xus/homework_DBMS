@@ -1,8 +1,5 @@
 #include <iostream>
 #include <string>
-#include <vector>
-#include <cstdio>
-#include <stack>
 #include <regex>
 using namespace std;
 
@@ -22,22 +19,9 @@ string defaultPath;  // 默认保存路径
 
 // 验证sql语句是否正确
 bool validate(string sql){
-    // 判断括号是否匹配
-    stack<char> st;
-    for (auto x : sql)
-    {
-        if (x == '[' || x == '(' || x == '{')
-            st.push(x);
-        else if (st.empty())
-            return false; 
-        else if ( (st.top() == '(' && x == ')') || (st.top () == '[' && x == ']') || (st.top() == '{' && x == '}') )
-            st.pop();
-        else
-            return false;
-    }
     // 定义标准sql语句
-    string sqlupdate="update\.+set\.+(where\.+)?END";
-    string sqldelete="delete\.+from\.+where\.+END";
+    string sqlupdate = "update\.+set\.+(where\.+)?END";
+    string sqldelete = "delete\.+from\.+where\.+END";
     string sqlinsert="insert\.+into\.+(\(\.+/)\.*)?values\(.+\)END";
     string sqlcreate="create table\.+\\(\.+\\)END";
     string sqlselect="select\.+from\.+(where\.+)?((group by)?|(order by)?|(having)?)END";
@@ -60,7 +44,6 @@ bool validate(string sql){
     if(sql.substr(0, 4) == "alter") {
 
     }
-    return st.empty();
 }
 
 // 创建
@@ -116,12 +99,20 @@ int sql_processer(){
     }
 }
 
-void info(){
-    cout << "请选择命令：" << endl;
-    cout << "1. 新建数据库" << endl;
-    cout << "2. 选择数据库" << endl;
-    cout << "3. 删除数据库" << endl;
-    cout << "exit. 退出" << endl;
+void info()
+{
+    cout << "input what you want to do:" << endl;
+}
+
+void help()
+{
+    cout << "list [database]/[table]" << endl;
+    cout << "use [database]" << endl;
+    cout << "delete [database]" << endl;
+    cout << "" << endl;
+    cout << "input what you want to do:" << endl;
+    cout << "input what you want to do:" << endl;
+    cout << "input what you want to do:" << endl;
 }
 
 int main(){
@@ -131,5 +122,5 @@ int main(){
     {
         /* code */
     }
-    
+    return 0;
 }
