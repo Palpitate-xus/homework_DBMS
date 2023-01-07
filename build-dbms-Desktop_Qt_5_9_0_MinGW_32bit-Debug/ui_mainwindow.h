@@ -31,7 +31,7 @@ class Ui_MainWindow
 public:
     QWidget *centralWidget;
     QPushButton *pushButton;
-    QTextEdit *textEdit;
+    QTextEdit *input_text;
     QTextBrowser *textBrowser;
     QLabel *label;
     QLabel *label_2;
@@ -49,9 +49,9 @@ public:
         pushButton = new QPushButton(centralWidget);
         pushButton->setObjectName(QStringLiteral("pushButton"));
         pushButton->setGeometry(QRect(480, 120, 75, 23));
-        textEdit = new QTextEdit(centralWidget);
-        textEdit->setObjectName(QStringLiteral("textEdit"));
-        textEdit->setGeometry(QRect(20, 30, 531, 81));
+        input_text = new QTextEdit(centralWidget);
+        input_text->setObjectName(QStringLiteral("input_text"));
+        input_text->setGeometry(QRect(20, 30, 531, 81));
         textBrowser = new QTextBrowser(centralWidget);
         textBrowser->setObjectName(QStringLiteral("textBrowser"));
         textBrowser->setGeometry(QRect(20, 150, 531, 191));

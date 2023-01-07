@@ -27,7 +27,7 @@
      <string>execute</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="textEdit">
+   <widget class="QTextEdit" name="input_text">
     <property name="geometry">
      <rect>
       <x>20</x>
