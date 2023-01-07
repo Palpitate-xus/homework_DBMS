@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdio>
 #include <stack>
+#include <regex>
 using namespace std;
 
 const int inf = 0x3f3f3f3f;
@@ -34,7 +35,31 @@ bool validate(string sql){
         else
             return false;
     }
+    // 定义标准sql语句
+    string sqlupdate="update\.+set\.+(where\.+)?END";
+    string sqldelete="delete\.+from\.+where\.+END";
+    string sqlinsert="insert\.+into\.+(\(\.+/)\.*)?values\(.+\)END";
+    string sqlcreate="create table\.+\\(\.+\\)END";
+    string sqlselect="select\.+from\.+(where\.+)?((group by)?|(order by)?|(having)?)END";
+    string sqldrop  ="drop table\.+END";
+    if(sql.substr(0, 5) == "create") {
 
+    }
+    if(sql.substr(0, 5) == "insert") {
+
+    }
+    if(sql.substr(0, 5) == "delete") {
+
+    }
+    if(sql.substr(0, 5) == "select") {
+
+    }
+    if(sql.substr(0, 5) == "update") {
+
+    }
+    if(sql.substr(0, 4) == "alter") {
+
+    }
     return st.empty();
 }
 
