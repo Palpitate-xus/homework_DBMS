@@ -18,4 +18,5 @@ void MainWindow::on_pushButton_clicked()
     QMessageBox::warning(this, tr("gmy"),
                                 ui->input_text->toPlainText().trimmed(),
                                 QMessageBox::Yes);
+    ui->textBrowser->setText(ui->input_text->toPlainText().trimmed());
 }
