@@ -4,6 +4,8 @@
 #include <cstdio>
 using namespace std;
 
+// 本文件用于SQL语句的解析
+
 // sql语句预处理
 string sql_processor(string raw_sql)
 {

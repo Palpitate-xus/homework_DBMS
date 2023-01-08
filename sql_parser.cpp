@@ -3,6 +3,8 @@
 #include <regex>
 using namespace std;
 
+// 本文件将使用正则表达式的方法进行SQL语句解析
+
 const int inf = 0x3f3f3f3f;
 
 // 表

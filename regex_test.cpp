@@ -1,6 +1,9 @@
 #include <iostream>
 #include <regex>
 using namespace std;
+
+// 本文件存放一些SQL语句的正则表达式模板
+
 // 标准sql语句
 // string sqlupdate = "update\.+set\.+(where\.+)?END";
 // string sqldelete = "delete\.+from\.+where\.+END";
