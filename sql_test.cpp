@@ -144,10 +144,106 @@ string parser(string sql)
         }
     }
     if(sql.substr(0, 5) == "select") {
-
+        // 标准的select语句：select [*]/[column] from [tablename] where [conditions]
+        int pos[20];
+        int count = 0;
+        for (int i = 6; i < sql.size(); i++)
+        {
+            if (sql[i] == ' ')
+            {
+                pos[count] = i; // 记录空格的位置
+                count++;
+            }
+        }
+        string tokens[99999];
+        for (int i = 0; i < count; i++)
+        {
+            tokens[i] = sql.substr(pos[i], pos[i+1]);
+        }
+        string raw_result = tokens[0];  // select出的列
+        string raw_tablename = tokens[2];  // 表名
+        string raw_conditions = tokens[4];  // select的条件
+        string result[99999];
+        // 如果select非全部列
+        if (raw_result != "*")
+        {
+            int col_count = 0;
+            int result_pos[99999];
+            for (int i = 0; i < raw_result.size(); i++)
+            {
+                if (raw_result[i] == '*')
+                {
+                    result_pos[col_count] = i;
+                    col_count++;
+                }
+            }
+            for (int i = 0; i < col_count; i++)
+            {
+                result[i] = raw_result.substr(result_pos[i], result_pos[i+1]);
+            }  
+        }
+        
+        string conditions[99999];
+        int con_count = 0;
+        for (int i = 5; i < count; i++)
+        {
+            conditions[con_count] = tokens[i];
+        }
     }
     if(sql.substr(0, 5) == "update") {
+        // 标准的update语句：update [tablename] set [updates] where [conditions]
+        int pos[20];
+        int count = 0;
+        for (int i = 6; i < sql.size(); i++)
+        {
+            if (sql[i] == ' ')
+            {
+                pos[count] = i; // 记录空格的位置
+                count++;
+            }
+        }
+        string tokens[99999];
+        for (int i = 0; i < count; i++)
+        {
+            tokens[i] = sql.substr(pos[i], pos[i+1]);
+        }
 
+        string tablename = tokens[0];
+        string raw_updates = tokens[2];
+        string raw_conditions = tokens[4];
+
+        string updates[99999];
+        string conditions[99999];
+        int updates_pos[99999];  // update中","的位置
+        int conditions_pos[99999];  // conditions中","的位置
+        int updates_count = 0;
+        int conditions_count = 0;
+        for (int i = 0; i < raw_updates.size(); i++)
+        {
+            if (raw_updates[i] == ',')
+            {
+                updates_pos[updates_count] = i;
+                updates_count++;
+            }
+        }
+        for (int i = 0; i < raw_conditions.size(); i++)
+        {
+            if (raw_conditions[i] == ',')
+            {
+                conditions_pos[conditions_count] = i;
+                conditions_count++;
+            }
+        }
+        updates[0] = raw_updates.substr(0, updates_pos[0]);
+        for (int i = 0; i < updates_count; i++)
+        {
+            updates[i+1] = raw_updates.substr(updates_pos[i], updates_pos[i+1]);
+        }
+        conditions[0] = raw_conditions.substr(0, conditions_pos[0]);
+        for (int i = 0; i < count; i++)
+        {
+            conditions[i+1] = raw_conditions.substr(conditions_pos[i], conditions_pos[i+1]);
+        }
     }
     if(sql.substr(0, 4) == "alter") {
 
