@@ -117,7 +117,7 @@ string parser(string sql)
         }
     }
     if(sql.substr(0, 10) == "delete from") {
-        // 标准delete语句：delete from [tablename] where [xxx]
+        // 标准delete语句：delete from [tablename] where [xxx] and ...
         int pos[20];
         int count = 0;
         for (int i = 12; i < sql.size(); i++)
@@ -127,7 +127,20 @@ string parser(string sql)
                 pos[count] = i; // 记录空格的位置
                 count++;
             }
-            
+        }
+        string tokens[99999];
+        for (int i = 0; i < count; i++)
+        {
+            tokens[i] = sql.substr(pos[i], pos[i+1]);
+        }
+        
+        string tablename = tokens[0];  // 提取表名
+        int andnum = count - 3;  // 条件的个数
+        string condition[99999];
+        int condition_count = 0;
+        for (int i = 2; i < count; i+=2)
+        {
+            condition[condition_count] = tokens[i];
         }
     }
     if(sql.substr(0, 5) == "select") {
