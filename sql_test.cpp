@@ -4,6 +4,20 @@
 #include <cstdio>
 using namespace std;
 
+struct strlist{
+    string str[30];
+    int len = 0;
+    void print()
+    {
+        for(int i = 0; i < len; i++)
+        cout << str[i] << endl;
+    }
+    void append(string nstr)
+    {
+        str[len++] = nstr;
+    }
+};
+
 // 本文件用于SQL语句的解析
 
 // sql语句预处理
@@ -145,6 +159,22 @@ string parser(string sql)
             condition[condition_count] = tokens[i];
         }
     }
+    if (sql.substr(0, 5) == "delete")
+    {
+        if (sql.substr(7, 14) == "database")
+        {
+            return sql.substr(16, sql.size());
+        }
+        else if (sql.substr(7, 11) == "table")
+        {
+            return sql.substr(13, sql.size());
+        }
+        else
+        {
+            return "invalid command";
+        }
+    }
+    
     if(sql.substr(0, 5) == "select") {
         // 标准的select语句：select [*]/[column] from [tablename] where [conditions]
         int pos[20];
@@ -190,6 +220,7 @@ string parser(string sql)
         for (int i = 5; i < count; i++)
         {
             conditions[con_count] = tokens[i];
+            con_count++;
         }
     }
     if(sql.substr(0, 5) == "update") {
@@ -248,12 +279,9 @@ string parser(string sql)
         }
     }
     if(sql.substr(0, 4) == "alter") {
-
+        // 或许会有这个功能
     }
 }
-
-
-
 
 int main()
 {
