@@ -2,15 +2,16 @@
 typedef int ll;
 const ll days[14]={0,365,334,306,275,245,214,184,153,122,92,61,31,0};
 struct Date{
+    Date():year(0),month(0),day(0){};
     Date(ll y,ll m,ll d):
         year(y),month(m),day(d){if(month>12||day>days[month]-days[month+1]+(month==2)*isleap())month=0,year=0,day=0;}
-    Date(char*s){
+    Date(const char*s){
         ll pos[2]={0,0};
-        for(ll i=0,k=0;*(s+i)&&k<2;i++)if(*(s+i)=='-')pos[k++]=i;
+        for(ll i=0,k=0;s[i]&&k<2;i++)if(s[i]=='-')pos[k++]=i;
         if(!pos[0]||!pos[1]||pos[1]==pos[0]+1||pos[1]-pos[0]>3||strlen(s)-pos[1]>3||pos[0]>4)return;
-        for(ll i=0;i<pos[0];i++)year=year*10+*(s+i)-48;
-        for(ll i=pos[0]+1;i<pos[1];i++)month=month*10+*(s+i)-48;
-        for(ll i=pos[1]+1;*(s+i);i++)day=day*10+*(s+i)-48;
+        for(ll i=0;i<pos[0];i++)year=year*10+s[i]-48;
+        for(ll i=pos[0]+1;i<pos[1];i++)month=month*10+s[i]-48;
+        for(ll i=pos[1]+1;s[i];i++)day=day*10+s[i]-48;
         if(month>12||day>days[month]-days[month+1]+(month==2)*isleap())month=0,year=0,day=0;
     }
     ll year=0,month=0,day=0;
@@ -62,4 +63,8 @@ Date operator-(Date a,ll b){
 }
 ll operator-(Date a,Date b){
     return a.convert()-b.convert();
+}
+std::ostream& operator<<(std::ostream& ost,Date a){
+    ost<<a.year<<'-'<<a.month<<'-'<<a.day;
+    return ost;
 }
