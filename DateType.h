@@ -1,4 +1,5 @@
-#include<iostream>
+#include <iostream>
+#include <cstring>
 typedef int ll;
 const ll days[14]={0,365,334,306,275,245,214,184,153,122,92,61,31,0};
 struct Date{

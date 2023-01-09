@@ -1,6 +1,9 @@
-#include<bits/stdc++.h>
-#include<direct.h>
-#include"DateType.h"
+#include <iostream>
+#include <map>
+#include <string>
+#include <direct.h>
+#include <io.h>
+#include "DateType.h"
 using namespace std;
 #define maxn 100010
 typedef int ll;
@@ -89,7 +92,9 @@ strlist getTablenames(string DBname){
     return tbls;
 }
 table getTablestruction(string DBname,string Tablename){
-    string filepath=DBname+"\\"+Tablename+".stc";table t={.tablename=Tablename};
+    string filepath=DBname+"\\"+Tablename+".stc";
+    table t;
+    t.tablename=Tablename;
     if(_access(filepath.c_str(),0))return t;//table not exist
     FILE*xx=fopen(filepath.c_str(),"rb");
     fread(&t.len,4,1,xx);
@@ -110,13 +115,13 @@ column setint(string columnName,bool isNull,ll scale){
     if(scale<=1)tem="tiny";
     else if(scale==2)tem="int",scale=4;
     else if(scale>=3)tem="long",scale=8;
-    return {.isNull=isNull,.dataType=tem,.dataName=columnName,.dsize=scale};
+    return {isNull,tem,columnName,scale};
 }
 column setstring(string columnName,bool isNull,ll length){
-    return {.isNull=isNull,.dataType="char",.dataName=columnName,.dsize=max(1,min(length,1005))};
+    return {isNull,"char",columnName,max(1,min(length,1005))};
 }
 column setdate(string columnName,bool isNull){
-    return {.isNull=isNull,.dataType="date",.dataName=columnName,.dsize=12};
+    return {isNull,"date",columnName,12};
 }
 ll insert(string DBname,string Tablename,strlist values){
     string filepath=DBname+"\\"+Tablename;
@@ -167,18 +172,18 @@ ll delet(string DBname,string Tablename,strlist cstr){
     return 0;
 }
 int main(){
-    /*createDatabase("info");
+    createDatabase("info");
     table newt;
     newt.append(setint("goodsCount",0,2));
     newt.append(setstring("goodsName",0,15));
     newt.append(setdate("saleDate",0));
-    createTable("info","goods",newt);*/
-    /*strlist nstr;
+    createTable("info","goods",newt);
+    strlist nstr;
     nstr.append("goodsCount 15");
     nstr.append("goodsName earphones");
     nstr.append("saleDate 2020-08-19");
-    insert("info","goods",nstr);*/
-    /*FILE*xx=fopen("info\\goods.dt","rb");
+    insert("info","goods",nstr);
+    FILE*xx=fopen("info\\goods.dt","rb");
     while(1){
         ll ct=0;char gn[16]="";Date sd;
         fread(&ct,4,1,xx);
@@ -187,5 +192,7 @@ int main(){
         if(feof(xx))break;
         cout<<ct<<','<<gn<<','<<sd<<endl;
     }
-    fclose(xx);*/
+    fclose(xx);
+    system("pause");
+    return 0;
 }

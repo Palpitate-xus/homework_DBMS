@@ -172,18 +172,18 @@ ll delet(string DBname,string Tablename,strlist cstr){
     return 0;
 }
 int main(){
-    /*createDatabase("info");
+    createDatabase("info");
     table newt;
     newt.append(setint("goodsCount",0,2));
     newt.append(setstring("goodsName",0,15));
     newt.append(setdate("saleDate",0));
-    createTable("info","goods",newt);*/
-    /*strlist nstr;
+    createTable("info","goods",newt);
+    strlist nstr;
     nstr.append("goodsCount 15");
     nstr.append("goodsName earphones");
     nstr.append("saleDate 2020-08-19");
-    insert("info","goods",nstr);*/
-    /*FILE*xx=fopen("info\\goods.dt","rb");
+    insert("info","goods",nstr);
+    FILE*xx=fopen("info\\goods.dt","rb");
     while(1){
         ll ct=0;char gn[16]="";Date sd;
         fread(&ct,4,1,xx);
@@ -192,5 +192,7 @@ int main(){
         if(feof(xx))break;
         cout<<ct<<','<<gn<<','<<sd<<endl;
     }
-    fclose(xx);*/
+    fclose(xx);
+    system("pause");
+    return 0;
 }
