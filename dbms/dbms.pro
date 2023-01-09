@@ -30,7 +30,11 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    dialog_login.h
+    dialog_login.h \
+    DateType.h \
+    logs.h \
+    sql_parser.h \
+    TableManage.h
 
 FORMS += \
         mainwindow.ui \
