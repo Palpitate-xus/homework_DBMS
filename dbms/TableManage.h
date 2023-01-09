@@ -1,6 +1,9 @@
-#include<bits/stdc++.h>
-#include<direct.h>
-#include"DateType.h"
+#include <iostream>
+#include <map>
+#include <string>
+#include <direct.h>
+#include <io.h>
+#include "DateType.h"
 using namespace std;
 #define maxn 100010
 typedef int ll;
@@ -89,7 +92,9 @@ strlist getTablenames(string DBname){
     return tbls;
 }
 table getTablestruction(string DBname,string Tablename){
-    string filepath=DBname+"\\"+Tablename+".stc";table t={.tablename=Tablename};
+    string filepath=DBname+"\\"+Tablename+".stc";
+    table t;
+    t.tablename=Tablename;
     if(_access(filepath.c_str(),0))return t;//table not exist
     FILE*xx=fopen(filepath.c_str(),"rb");
     fread(&t.len,4,1,xx);
@@ -110,13 +115,13 @@ column setint(string columnName,bool isNull,ll scale){
     if(scale<=1)tem="tiny";
     else if(scale==2)tem="int",scale=4;
     else if(scale>=3)tem="long",scale=8;
-    return {.isNull=isNull,.dataType=tem,.dataName=columnName,.dsize=scale};
+    return {isNull,tem,columnName,scale};
 }
 column setstring(string columnName,bool isNull,ll length){
-    return {.isNull=isNull,.dataType="char",.dataName=columnName,.dsize=max(1,min(length,1005))};
+    return {isNull,"char",columnName,max(1,min(length,1005))};
 }
 column setdate(string columnName,bool isNull){
-    return {.isNull=isNull,.dataType="date",.dataName=columnName,.dsize=12};
+    return {isNull,"date",columnName,12};
 }
 ll insert(string DBname,string Tablename,strlist values){
     string filepath=DBname+"\\"+Tablename;
