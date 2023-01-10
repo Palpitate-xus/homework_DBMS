@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "dialog_login.h"
+#include "TableManage.h"
 #include <QApplication>
 #include <iostream>
 using namespace std;
