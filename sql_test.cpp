@@ -223,21 +223,32 @@ string parser(string sql)
             {
                 pos[count] = i; // 记录空格的位置
                 count++;
-                cout << pos[count-1] << endl;
             }
         }
-        cout << "count: " << count << endl;
         string tokens[999];
         tokens[0] = sql.substr(7, pos[0] - 7);
         for (int i = 0; i < count; i++)
         {
             tokens[i+1] = sql.substr(pos[i] + 1, pos[i+1] - pos[i]);
-            cout << tokens[i] << endl;
         }
-        cout << tokens[count] << endl;
+        strlist conditions[999];
+        int conditions_pos = 0;
+        cout << "count:  " << count << endl;
+        for (int i = 4; i < count + 1; i++)
+        {
+            if (tokens[i] == "or ")
+            {
+                conditions_pos++;
+            }
+            else if (tokens[i] != "and ")
+            {
+                conditions[conditions_pos].append(tokens[i]);
+            }
+        }
         string raw_result = tokens[0];  // select出的列
+        cout << raw_result << endl;
         string raw_tablename = tokens[2];  // 表名
-        string raw_conditions = tokens[4];  // select的条件
+        cout << raw_tablename << endl;
         string result[999];
         // 如果select非全部列
         if (raw_result != "*")
@@ -246,7 +257,7 @@ string parser(string sql)
             int result_pos[999];
             for (int i = 0; i < raw_result.size(); i++)
             {
-                if (raw_result[i] == '*')
+                if (raw_result[i] == ',')
                 {
                     result_pos[col_count] = i;
                     col_count++;
@@ -254,17 +265,18 @@ string parser(string sql)
             }
             for (int i = 0; i < col_count; i++)
             {
-                result[i] = raw_result.substr(result_pos[i], result_pos[i+1]);
+                result[i] = raw_result.substr(result_pos[i], result_pos[i+1] - result_pos[i]);
+                cout << result[i] << endl;
             }  
         }
         
-        string conditions[999];
-        int con_count = 0;
-        for (int i = 5; i < count; i++)
-        {
-            conditions[con_count] = tokens[i];
-            con_count++;
-        }
+        // string conditions[999];
+        // int con_count = 0;
+        // for (int i = 5; i < count; i++)
+        // {
+        //     conditions[con_count] = tokens[i];
+        //     con_count++;
+        // }
     }
     if(sql.substr(0, 6) == "update") {
         // 标准的update语句：update [tablename] set [updates] where [conditions]
@@ -306,8 +318,8 @@ int main()
     // sql_input = "delete from test where column1=value1 and column2=value2";
     // sql_input = "delete database test";
     // sql_input = "delete table test";
-    // sql_input = "select * from test where abc=efg or efg=def and opq=xyz";
-    sql_input = "update test set abc=efg where efg=def or opq=xyz and xyz=abc";
+    sql_input = "select * from test where abc=efg or efg=def and opq=xyz";
+    // sql_input = "update test set abc=efg where efg=def or opq=xyz and xyz=abc";
     sql_input = sql_processor(sql_input);
     parser(sql_input);
     system("pause");
