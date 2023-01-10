@@ -1,5 +1,7 @@
 #include "dialog_login.h"
 #include "ui_dialog_login.h"
+#include "logs.h"
+#include <string>
 #include <QMessageBox>
 Dialog_login::Dialog_login(QWidget *parent) :
     QDialog(parent),
@@ -22,7 +24,10 @@ void Dialog_login::on_exitBtn_clicked()
 void Dialog_login::on_loginBtn_clicked()
 {
     if(ui->usrlineEdit->text().trimmed() == tr("admin") && ui->pwdlineEdit->text() == tr("admin"))
-            accept();
+    {
+         accept();
+         logs("admin", "login", getTime());
+    }
      else
      {
          QMessageBox::warning(this, tr("Warning"), tr("user name or password error!"),QMessageBox::Yes);

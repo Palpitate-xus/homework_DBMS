@@ -14,7 +14,7 @@ string getTime()
 }
 
 // 写入日志文件
-int log(string user, string operation, string time)
+int logs(string user, string operation, string time)
 {
     ofstream oFile;
     oFile.open("dbms.log", ios::app);
