@@ -26,6 +26,9 @@ string sql_processor(string raw_sql)
     // 大写转小写
     for(auto &i : raw_sql){
         i = tolower(i);
+        if (i > 127) {
+            return "error";
+        }
     }
     raw_sql.erase(remove(raw_sql.begin(), raw_sql.end(), '\n'),raw_sql.end());  // 删除换行符
     raw_sql.erase(remove(raw_sql.begin(), raw_sql.end(), '\t'),raw_sql.end());  // 删除制表符
