@@ -50,7 +50,7 @@ string parser(string sql)
             return sql.substr(13, sql.size() - 13);  // 返回数据库名称
         }
     }
-    if(sql.substr(0, 6) == "create") {
+    else if(sql.substr(0, 6) == "create") {
         // create标准格式: create database [databasename]
         cout << "create" << endl;
         if (sql.substr(7, 8) == "database")
@@ -98,7 +98,7 @@ string parser(string sql)
             return sql.substr(14, sql.size());  // 这个待完成
         }
     }
-    if(sql.substr(0, 11) == "insert into") {
+    else if(sql.substr(0, 11) == "insert into") {
         cout << "insert into" << endl;
         int pos[20];
         int count = 0;
@@ -158,7 +158,7 @@ string parser(string sql)
             values[i+1] = raw_values.substr(val_pos[i] + 1, val_pos[i+1] - val_pos[i] - 1);  // 提取数值
         }
     }
-    if(sql.substr(0, 11) == "delete from") {
+    else if(sql.substr(0, 11) == "delete from") {
         // 标准delete语句：delete from [tablename] where [xxx] and ...
         cout << "delete from" << endl;
         int pos[20];
@@ -191,7 +191,7 @@ string parser(string sql)
         }
         cout << condition[0] << endl << condition[1] << endl;
     }
-    if (sql.substr(0, 6) == "delete")
+    else if (sql.substr(0, 6) == "delete")
     {
         cout << "delete" << endl;
         if (sql.substr(7, 8) == "database")
@@ -212,7 +212,7 @@ string parser(string sql)
         }
     }
     
-    if(sql.substr(0, 6) == "select") {
+    else if(sql.substr(0, 6) == "select") {
         // 标准的select语句：select [*]/[column] from [tablename] where [conditions]
         cout << "select" << endl;
         int pos[20];
@@ -278,7 +278,7 @@ string parser(string sql)
         //     con_count++;
         // }
     }
-    if(sql.substr(0, 6) == "update") {
+    else if(sql.substr(0, 6) == "update") {
         // 标准的update语句：update [tablename] set [updates] where [conditions]
         cout << "update" << endl;
         int pos[20];
@@ -302,9 +302,14 @@ string parser(string sql)
         cout << tokens[count] << endl;
         string tablename = tokens[0];
     }
-    if(sql.substr(0, 4) == "alter") {
+    else if(sql.substr(0, 4) == "alter") {
         // 或许会有这个功能
     }
+    else
+    {
+        return "SQL syntax error";
+    }
+    
 }
 
 int main()
