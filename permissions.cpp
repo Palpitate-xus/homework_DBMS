@@ -37,16 +37,19 @@ int login(string username, string password)
             if (password == users[i].password)
             {
                 infile.close();
+                cout << "successfully login" << endl;
                 return 1;
             }
             else
             {
                 infile.close();
+                cout << "wrong password" << endl;
                 return -1;
             }
         }
     }
     infile.close();
+    cout << "this user is not exist" << endl;
     return 0;
 }
 
@@ -59,10 +62,12 @@ int permissionQuery(string username)
         {
             if (users[i].permission == "admin")
             {
+                cout << "permission: admin" << endl;
                 return 1;
             }
             else if (users[i].permission == "user")
             {
+                cout << "permission: user" << endl;
                 return 0;
             }
         }
@@ -80,9 +85,6 @@ int createUser(user new_user)
 
 int main ()
 {
-    
-   string data;
- 
 //    ofstream outfile;
 //    outfile.open("user.dat");
 //    cin.getline(data, 100);
@@ -109,7 +111,10 @@ int main ()
    
    // 关闭打开的文件
 //    infile.close();
-    login("test", "test");
+    if (login("xus", "xus"))
+    {
+        permissionQuery("xus");
+    }
     system("pause");
    return 0;
 }
