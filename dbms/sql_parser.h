@@ -4,19 +4,6 @@
 #include <cstdio>
 using namespace std;
 
-struct strlist{
-    string str[30];
-    int len = 0;
-    void print()
-    {
-        for(int i = 0; i < len; i++)
-        cout << str[i] << endl;
-    }
-    void append(string nstr)
-    {
-        str[len++] = nstr;
-    }
-};
 
 // 本文件用于SQL语句的解析
 
