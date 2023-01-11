@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <algorithm>
 #include "set.h"
+#include "TableManage.h"
 using namespace std;
 
 struct strlist{
@@ -19,6 +20,7 @@ struct strlist{
     }
 };
 
+string now_database;
 // 本文件用于SQL语句的解析
 
 // sql语句预处理
@@ -48,6 +50,7 @@ string parser(string sql)
         if(sql.substr(4, 8) == "database") {
             cout << "database" << endl;
             cout << sql.substr(13, sql.size() - 13) << endl;
+            now_database = sql.substr(13, sql.size() - 13);  // 选择数据库
             return sql.substr(13, sql.size() - 13);  // 返回数据库名称
         }
     }
@@ -58,6 +61,7 @@ string parser(string sql)
         {
             cout << "database" << endl;
             cout << sql.substr(16, sql.size() - 16) << endl;
+            createDatabase(sql.substr(16, sql.size() - 16));
             return sql.substr(16, sql.size() - 16);  // 返回数据库名称
         }
         // create标准格式：create table [tablename] {col: type, col: type……}
@@ -199,6 +203,7 @@ string parser(string sql)
         {
             cout << "database" << endl;
             cout << sql.substr(16, sql.size() - 16) << endl;
+            dropDatabase(sql.substr(16, sql.size() - 16));  // 执行删除操作
             return sql.substr(16, sql.size());
         }
         else if (sql.substr(7, 5) == "table")

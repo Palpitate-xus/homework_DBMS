@@ -34,7 +34,8 @@ HEADERS += \
     DateType.h \
     logs.h \
     sql_parser.h \
-    TableManage.h
+    TableManage.h \
+    permissions.h
 
 FORMS += \
         mainwindow.ui \

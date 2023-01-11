@@ -20,16 +20,8 @@ int logs(string user, string operation, string time)
     oFile.open("dbms.log", ios::app);
     if (!oFile)
         cout << "error 1" << endl;
-    else
-        oFile.close();
     oFile << time << "    " << user << "    " << operation << endl;
     oFile.close();
     return 0;
 }
 
-int main()
-{
-    getTime();
-    system("pause");
-    return 0;
-}

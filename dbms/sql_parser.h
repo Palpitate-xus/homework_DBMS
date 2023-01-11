@@ -272,12 +272,3 @@ string parser(string sql)
         // 或许会有这个功能
     }
 }
-
-int main()
-{
-    string sql_input;
-    cin >> sql_input;
-    sql_input = sql_processor(sql_input);
-    parser(sql_input);
-    system("pause");
-}

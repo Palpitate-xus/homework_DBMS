@@ -1,12 +1,7 @@
-#include <iostream>
-#include <map>
-#include <string>
-#include <direct.h>
-#include <io.h>
-#include "DateType.h"
-#include <vector>
-#include "set.h"
 #include<bits/stdc++.h>
+#include<direct.h>
+#include"DateType.h"
+#include"set.h"
 using namespace std;
 typedef int ll;
 const long long INF=0x8000000000000000;
