@@ -1,5 +1,4 @@
-#include <iostream>
-#include <cstring>
+#include<iostream>
 typedef int ll;
 const ll days[14]={0,365,334,306,275,245,214,184,153,122,92,61,31,0};
 struct Date{
@@ -19,6 +18,12 @@ struct Date{
     bool isleap(){return (!(year%4)&&year%100)||!(year%400);}
     void print(){std::cout<<year<<'-'<<month<<'-'<<day<<std::endl;}
     ll convert(){return year*365+year/4-year/100+year/400-days[month]-(month<=2)*isleap()+day;}
+    ll operator[](ll st){
+        if(st==0)return year;
+        if(st==1)return month;
+        if(st==2)return day;
+        return -1;
+    }
 };
 Date DISCONV(ll num){//turn a day count into Date object
     Date t={0,12,31};
@@ -46,6 +51,9 @@ bool operator<(Date a,Date b){
 bool operator==(Date a,Date b){
     return a.year==b.year&&a.month==b.month&&a.day==b.day;
 }
+bool operator!=(Date a,Date b){
+    return a.year!=b.year||a.month!=b.month||a.day!=b.day;
+}
 bool operator>=(Date a,Date b){
     if(a.year!=b.year)return a.year>b.year;
     if(a.month!=b.month)return a.month>b.month;
@@ -64,6 +72,14 @@ Date operator-(Date a,ll b){
 }
 ll operator-(Date a,Date b){
     return a.convert()-b.convert();
+}
+std::string transstr(long long t){
+    std::string tem="";
+    while(t)tem=(char)(t%10+48)+tem,t/=10;
+    return tem;
+}
+std::string str(Date t){
+    return transstr(t.year)+'-'+transstr(t.month)+'-'+transstr(t.day);
 }
 std::ostream& operator<<(std::ostream& ost,Date a){
     ost<<a.year<<'-'<<a.month<<'-'<<a.day;
