@@ -8,9 +8,9 @@ using namespace std;
 #define maxn 100010
 typedef int ll;
 struct column{
-    bool isNull=0;
-    string dataType="",dataName="";
-    ll dsize=0;
+    bool isNull;
+    string dataType,dataName;
+    ll dsize;
     void print(){
         cout<<"ColumnName: "<<dataName<<'\n';
         cout<<"hasNull: "<<isNull<<'\n';
@@ -28,9 +28,16 @@ struct table{
 };
 struct strlist{
     string str[30];
-    ll len=0;
-    void print(){for(ll i=0;i<len;i++)cout<<str[i]<<endl;}
-    void append(string nstr){str[len++]=nstr;}
+    int len = 0;
+    void print()
+    {
+        for(int i = 0; i < len; i++)
+        cout << str[i] << endl;
+    }
+    void append(string nstr)
+    {
+        str[len++] = nstr;
+    }
 };
 struct intlist{
     //
