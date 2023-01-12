@@ -8,6 +8,7 @@
 using namespace std;
 
 int now_permission;
+string now_user;
 string modifylogic(string logic){
     if(logic == "(" || logic == ")"|| logic == "and" || logic == "or" ) return logic;
     for(int i = 0; i < logic.size(); i++){
@@ -40,11 +41,13 @@ bool execute(string sql){
         if(sql.substr(4, 8) == "database"){
             DBname = sql.substr(13, sql.size() - 13);
             if(_access(DBname.c_str(),0)){
-                cout<<"Database not found"<<endl;///////////////////////////////////////////////////////////////////
+                cout<<"Database not found"<<endl;
                 DBname="";
+                log(now_user,"use database error",getTime());
                 return 1;//设置访问失败，不存在该数据库
             }
-            cout<<"set Database to "<<DBname<<endl;/////////////////////////////////////////////////////////////////
+            cout<<"set Database to "<<DBname<<endl;
+            log(now_user,"use database success",getTime());
             return 0;//修改成功
         }
     }
@@ -53,7 +56,8 @@ bool execute(string sql){
         if (sql.substr(7, 4) == "user"){
             if (!now_permission) {
                 cout << "permission denied" << endl;
-                return "permission denied";
+                log(now_user,"permission denied",getTime());
+                return 1;
             }
             int space_pos[12];
             int count = 0;
@@ -78,6 +82,7 @@ bool execute(string sql){
             if (permissionQuery(temp_user.username) != -1) {
                 // 如果已经存在该用户
                 cout << "error: user already exist" << endl;
+                log(now_user,"error: user already exist",getTime());
                 return "error: user already exist";
             }
             createUser(temp_user);
@@ -87,14 +92,17 @@ bool execute(string sql){
         if (sql.substr(7, 8) == "database"){
             if (!now_permission) {
                 cout << "permission denied" << endl;
-                return "permission denied";
+                log(now_user,"permission denied",getTime());
+                return 1;
             } 
             int tem=createDatabase(sql.substr(16, sql.size() - 16));
             if(tem){
-                cout<<"Failed:Database "<<sql.substr(16, sql.size() - 16)<<" already exists"<<endl;////////////////
+                cout<<"Failed:Database "<<sql.substr(16, sql.size() - 16)<<" already exists"<<endl;
+                log(now_user, "create database error", getTime());
             }
             else {
-                cout<<"Create Database succeeded"<<endl;////////////////////////////////////////////////////////////
+                cout<<"Create Database succeeded"<<endl;
+                log(now_user, "create database succeeded", getTime());
             }
             return tem;
         }
@@ -102,10 +110,12 @@ bool execute(string sql){
         if (sql.substr(7, 5) == "table"){
             if (!now_permission) {
                 cout << "permission denied" << endl;
-                return "permission denied";
+                log(now_user, "permission denied", getTime());
+                return 1;
             }
             if(_access(DBname.c_str(),0)){
-                cout<<"Invalid Database name:"+DBname<<endl;///////////////////////////////////////////////////////////
+                cout<<"Invalid Database name:"+DBname<<endl;
+                log(now_user, "invalid database name", getTime());
                 return 1;
             }
             string left_sql = sql.substr(13, sql.size()-13);
@@ -150,18 +160,21 @@ bool execute(string sql){
                 pos=commapos+1;
             }
             if(createTable(DBname,tbl)){
-                cout<<"Table "+tbl.tablename+" already exists"<<endl;//////////////////////////////////////////////////
+                cout<<"Table "+tbl.tablename+" already exists"<<endl;
+                log(now_user, "table already exists", getTime());
                 return 1;
             }
             else{
-                cout<<"Table create succeded"<<endl;//////////////////////////////////////////////////////////////////
+                cout<<"Table create succeded"<<endl;
+                log(now_user, "table create succeded", getTime());
                 return 0;
             }
         }
     }
     else if(sql.substr(0, 12) == "insert into "){
         if(_access(DBname.c_str(),0)){
-            cout<<"Invalid Database name:"+DBname<<endl;///////////////////////////////////////////////////////////
+            cout<<"Invalid Database name:"+DBname<<endl;
+            log(now_user, "invalid database name", getTime());
             return 1;
         }
         vector<string>subs;
@@ -171,7 +184,7 @@ bool execute(string sql){
             if(sql[st]=='('){
                 int ed=++st;while(sql[ed]!=')'&&ed<sql.size())ed++;
                 if(ed>=sql.size()){
-                    cout<<"SQL syntax error"<<endl;/////////////////////////////////////////////////////////////
+                    cout<<"SQL syntax error"<<endl;
                     return 1;
                 }
                 subs.push_back(sql.substr(st,ed-st));
@@ -185,7 +198,7 @@ bool execute(string sql){
         }
         string tablename=subs.front();
         if(_access((DBname+"\\"+tablename+".stc").c_str(),0)){
-            cout<<"Table "+tablename+" not exist"<<endl;///////////////////////////////////////////////////////////
+            cout<<"Table "+tablename+" not exist"<<endl;
             return 1;
         }
         subs.erase(subs.begin());
@@ -199,18 +212,19 @@ bool execute(string sql){
             if(stc>=columns.size()||stv>=vals.size())break;
         }
         if(insert(DBname,tablename,values)){
-            cout<<"Invalid data, please check"<<endl;/////////////////////////////////////////////////////
+            cout<<"Invalid data, please check"<<endl;
             return 1;
         }
         else{
-            cout<<"Data inserted"<<endl;/////////////////////////////////////////////////////////////////////
+            cout<<"Data inserted"<<endl;
+            log(now_user, "data inserted", getTime());
             return 0;
         }
     }
     else if(sql.substr(0, 12) == "delete from "){
         // 标准delete语句：delete from [tablename] where [xxx] and ...
         if(_access(DBname.c_str(),0)){
-            cout<<"Invalid Database name:"+DBname<<endl;///////////////////////////////////////////////////////////
+            cout<<"Invalid Database name:"+DBname<<endl;
             return 1;
         }
         vector<string>subs;
@@ -226,40 +240,42 @@ bool execute(string sql){
         }
         string tablename=subs.front();
         if(_access((DBname+"\\"+tablename+".stc").c_str(),0)){
-            cout<<"Table "+tablename+" not exist"<<endl;///////////////////////////////////////////////////////////
+            cout<<"Table "+tablename+" not exist"<<endl;
             return 1;
         }
         subs.erase(subs.begin());
         if(!subs.size()){
             strlist aint={{""},0};
             delet(DBname,tablename,aint);
-            cout<<"Delete done"<<endl;//////////////////////////////////////////////////////////////////////////////////
+            cout<<"Delete done"<<endl;
+            log(now_user, "delete done", getTime());
             return 0;
         }
         if(subs.size()==1){
-            cout<<"SQL syntax error"<<endl;/////////////////////////////////////////////////////////////////////
+            cout<<"SQL syntax error"<<endl;
             return 1;
         }
         *subs.begin()="(";subs.push_back(")");
         for(auto it=subs.begin();it!=subs.end();it++)*it=modifylogic(*it);
         vector<strlist>lgcs=BreakDown(subs);
         for(auto it=lgcs.begin();it!=lgcs.end();it++)delet(DBname,tablename,*it);
-        cout<<"Delete done"<<endl;//////////////////////////////////////////////////////////////////////////////////
+        cout<<"Delete done"<<endl;
+        log(now_user, "delete done", getTime());
         return 0;
     }
     else if (sql.substr(0, 4) == "drop"){
         if (!now_permission) {
             cout << "permission denied" << endl;
-            return "permission denied";
+            return 1;
         }
         if(_access(DBname.c_str(),0)){
-            cout<<"Invalid Database name:"+DBname<<endl;///////////////////////////////////////////////////////////
+            cout<<"Invalid Database name:"+DBname<<endl;
             return 1;
         }
         int st=4;
         while(sql[st]==' '&&st<sql.size()) st++;
         if(st>=sql.size()){
-            cout<<"SQL syntax error"<<endl;//////////////////////////////////////////////////////////
+            cout<<"SQL syntax error"<<endl;
             return 1;
         }
         int ed=st;
@@ -272,11 +288,11 @@ bool execute(string sql){
             while(sql[ed]!=' '&&ed<sql.size()) ed++;
             string tablename=sql.substr(st,ed-st);
             if(dropTable(DBname,tablename)){
-                cout<<"Table "+tablename+" not exist"<<endl;//////////////////////////////////////////////////////////////
+                cout<<"Table "+tablename+" not exist"<<endl;
                 return 1;
             }
             else{
-                cout<<"Table dropped"<<endl;/////////////////////////////////////////////////////////////////
+                cout<<"Table dropped"<<endl;
                 return 0;
             }
         }
@@ -285,21 +301,22 @@ bool execute(string sql){
             ed=st;while(sql[ed]!=' '&&ed<sql.size())ed++;
             string dbname=sql.substr(st,ed-st);
             if(dropDatabase(dbname)){
-                cout<<"Database "+dbname+" not exist"<<endl;///////////////////////////////////////////////////
+                cout<<"Database "+dbname+" not exist"<<endl;
                 return 1;
             }
             else{
-                cout<<"Database dropped"<<endl;/////////////////////////////////////////////////////////////////
+                cout<<"Database dropped"<<endl;
+                log(now_user, "database dropped", getTime());
                 return 0;
             }
         }
-        cout<<"SQL syntax error"<<endl;//////////////////////////////////////////////////////////
+        cout<<"SQL syntax error"<<endl;
         return 1;
     }
     else if(sql.substr(0, 6) == "select") {
         // 标准的select语句：select [*]/[column] from [tablename] where [conditions]
         if(_access(DBname.c_str(),0)){
-            cout<<"Invalid Database name:"+DBname<<endl;///////////////////////////////////////////////////////////
+            cout<<"Invalid Database name:"+DBname<<endl;
             return 1;
         }
         vector<string>subs;
@@ -315,7 +332,7 @@ bool execute(string sql){
         }
         string tablename=*(subs.begin()+2),columns=*subs.begin();
         if(_access((DBname+"\\"+tablename+".stc").c_str(),0)){
-            cout<<"Table "+tablename+" not exist"<<endl;///////////////////////////////////////////////////////////
+            cout<<"Table "+tablename+" not exist"<<endl;
             return 1;
         }
         table tbl=getTablestruction(DBname,tablename);
@@ -326,7 +343,7 @@ bool execute(string sql){
             int ed=st;while(columns[ed]!=','&&ed<columns.size())ed++;
             string col=columns.substr(st,ed-st);
             if(!nonslc.count(col)){
-                cout<<"Invalid column name "+col<<endl;////////////////////////////////////////////////
+                cout<<"Invalid column name "+col<<endl;
                 return 1;
             }
             nonslc.erase(col);
@@ -334,15 +351,18 @@ bool execute(string sql){
         }
         skip:subs.erase(subs.begin());subs.erase(subs.begin());subs.erase(subs.begin());
         if(subs.size()==1){
-            cout<<"SQL syntax error"<<endl;/////////////////////////////////////////////////////////////////////
+            cout<<"SQL syntax error"<<endl;
             return 1;
         }
-        for(int i=0;i<tbl.len;i++)if(!nonslc.count(tbl.cols[i].dataName))cout<<tbl.cols[i].dataName+' '<<ends;///////////////////////////////////////////////////////////////////
-        cout<<'\n'<<ends;////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        for(int i=0;i<tbl.len;i++)if(!nonslc.count(tbl.cols[i].dataName))cout<<tbl.cols[i].dataName+' '<<ends;
+        cout<<'\n'<<ends;
         if(!subs.size()){
             strlist aint={{""},0};vector<string>ans;
             ans=lookup(DBname,tablename,aint,nonslc);
-            for(auto it=ans.cbegin();it!=ans.cend();it++)cout<<*it<<endl;/////////////////////////////////////////////////////////////////
+            for(auto it=ans.cbegin();it!=ans.cend();it++) {
+                cout<<*it<<endl;
+                log(now_user, *it, getTime());
+            }
             return 0;
         }
         *subs.begin()="(";subs.push_back(")");
@@ -350,7 +370,10 @@ bool execute(string sql){
         vector<strlist>lgcs=BreakDown(subs);
         for(auto it=lgcs.begin();it!=lgcs.end();it++){
             vector<string>ans=lookup(DBname,tablename,*it,nonslc);
-            for(auto it=ans.cbegin();it!=ans.cend();it++)cout<<*it<<endl;/////////////////////////////////////////////////////////////////
+            for(auto it=ans.cbegin();it!=ans.cend();it++){
+                cout<<*it<<endl;
+                log(now_user, "*it", getTime());
+            }
         }
         return 0;
     }
@@ -381,7 +404,7 @@ bool execute(string sql){
     else if(sql.substr(0, 4) == "view") {
         int st=4;while(sql[st]==' '&&st<sql.size())st++;
         if(st>=sql.size()){
-            cout<<"SQL syntax error"<<endl;//////////////////////////////////////////////////////////
+            cout<<"SQL syntax error"<<endl;
             return 1;
         }
         int ed=st;while(sql[ed]!=' '&&ed<sql.size())ed++;
@@ -392,25 +415,26 @@ bool execute(string sql){
             string tablename=sql.substr(st,ed-st);
             table tbl=getTablestruction(DBname,tablename);
             if(!tbl.len){
-                cout<<"Table "+tablename+" not exist"<<endl;////////////////////////////////////////////
+                cout<<"Table "+tablename+" not exist"<<endl;
                 return 1;
             }
             else{
-                tbl.print();/////////////////////////////////////////////////////////////////////////////////////////
+                tbl.print();
                 return 0;
             }
         }
         else if(op=="database"){
             strlist tbln=getTablenames(DBname);
-            tbln.print();///////////////////////////////////////////////////////////////////////
+            tbln.print();
+            log(now_user, "view database", getTime());
             return 0;
         }
-        cout<<"SQL syntax error"<<endl;//////////////////////////////////////////////////////////
+        cout<<"SQL syntax error"<<endl;
         return 1;
     }
     else
     {
-        cout<<"SQL syntax error"<<endl;///////////////////////////////////////////////////
+        cout<<"SQL syntax error"<<endl;
         return 1;
     }
     return 1;
@@ -435,6 +459,8 @@ int main()
     cin >> username >> password;
     if (login(username, password))
     {
+        now_user = username;
+        log(now_user,"login",getTime());
         now_permission = permissionQuery(username);
         while (1)
         {
