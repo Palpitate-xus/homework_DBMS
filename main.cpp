@@ -448,6 +448,7 @@ int main()
     // sql_input = "use database test";
     // sql_input = "create database test";
     // sql_input = "insert into test (column1,column2,column3,column4) values (value1,value2,value3,value4)";
+    // insert into test (column1,column2,column3,column4) values (value1,value2,1,2023-03-01)
     // sql_input = "delete from test <where column1=value1 and (column2>value2 or column3<value3)>";
     // sql_input = "drop database test";
     // sql_input = "drop table test";

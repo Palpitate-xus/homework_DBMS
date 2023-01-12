@@ -16,12 +16,9 @@ string getTime()
 // 写入日志文件
 int log(string user, string operation, string time)
 {
-    ofstream oFile;
-    oFile.open("dbms.log", ios::app);
+    fstream oFile("dbms.log", ios::binary | ios::out | ios::app);
     if (!oFile)
         cout << "error 1" << endl;
-    else
-        oFile.close();
     oFile << time << "    " << user << "    " << operation << endl;
     oFile.close();
     return 0;
