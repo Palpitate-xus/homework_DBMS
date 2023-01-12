@@ -18,9 +18,6 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     QString message;
-            message = QString::fromStdString(execute(sql_processor(ui->input_text->toPlainText().trimmed().toStdString())));
-    QMessageBox::warning(this, tr("info"),
-                                message,
-                                QMessageBox::Yes);
+    message = QString::fromStdString(execute(sql_processor(ui->input_text->toPlainText().trimmed().toStdString())));
     ui->textBrowser->setText(message);
 }

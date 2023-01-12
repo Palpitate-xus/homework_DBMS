@@ -44,8 +44,10 @@ string execute(string sql){
                 cout<<"Database not found"<<endl;///////////////////////////////////////////////////////////////////
                 DBname="";
                 return "database not exist";//设置访问失败，不存在该数据库
+                logs("xus","Database not exist",getTime());
             }
             cout<<"set Database to "<<DBname<<endl;/////////////////////////////////////////////////////////////////
+            logs("xus","set Database name",getTime());
             return "successfully";//修改成功
         }
     }
@@ -81,17 +83,20 @@ string execute(string sql){
                 return "error: user already exist";
             }
             createUser(username, password, permission);
+            logs("xus","create User",getTime());
             cout << "create user  " << username << "  succeeded" << endl;
         }
         // create标准格式: create database [databasename]
         if (sql.substr(7, 8) == "database"){
             if (!now_permission) {
                 cout << "permission denied" << endl;
+                logs("xus","permission denied",getTime());
                 return "permission denied";
             } 
             int tem=createDatabase(sql.substr(16, sql.size() - 16));
             if(tem){
                 cout<<"Failed:Database "<<sql.substr(16, sql.size() - 16)<<" already exists"<<endl;////////////////
+                logs("xus","Database already exists",getTime());
                 return "database already exists";
             }
             else {
