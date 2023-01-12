@@ -1,21 +1,18 @@
+#ifndef LOGIN_H
+#define LOGIN_H
+#include <string>
 #include <iostream>
 #include <fstream>
-#include <map>
-#include <string>
 using namespace std;
-
-struct user{
-    string username;
-    string password;
-    string permission;
-};
-
-user users[99999];
-int user_count = 0;
-
-// 登录函数，返回值1表示登陆成功，0表示不存在该用户，-1表示密码错误。
 int userLogin(string username, string password)
 {
+    struct user{
+        string username;
+        string password;
+        string permission;
+    };
+    user users[999];
+    int user_count = 0;
     // 读取users数据
     string data;
     ifstream infile;
@@ -53,32 +50,4 @@ int userLogin(string username, string password)
     return 0;
 }
 
-// 用户权限查询函数
-int permissionQuery(string username)
-{
-    for (int i = 0; i < user_count; i++)
-    {
-        if (username == users[i].username)
-        {
-            if (users[i].permission == "admin")
-            {
-                cout << "permission: admin" << endl;
-                return 1;
-            }
-            else if (users[i].permission == "user")
-            {
-                cout << "permission: user" << endl;
-                return 0;
-            }
-        }
-    }
-}
-
-// 创建用户
-int createUser(user new_user)
-{
-    fstream fs("user.dat", ios::binary | ios::out | ios::app);
-    fs << new_user.username << " " << new_user.password << " " << new_user.permission << endl;
-    fs.close();
-    return 0;
-}
+#endif // LOGIN_H

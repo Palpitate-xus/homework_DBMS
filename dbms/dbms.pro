@@ -35,7 +35,9 @@ HEADERS += \
     logs.h \
     sql_parser.h \
     TableManage.h \
-    permissions.h
+    set.h \
+    permission.h \
+    login.h
 
 FORMS += \
         mainwindow.ui \

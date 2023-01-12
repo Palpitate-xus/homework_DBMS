@@ -6,9 +6,9 @@ using namespace std;
 typedef int ll;
 const long long INF=0x8000000000000000;
 struct column{
-    bool isNull=0;
-    string dataType="",dataName="";
-    ll dsize=0;
+    bool isNull;
+    string dataType,dataName;
+    ll dsize;
     void print(){
         cout<<"ColumnName: "<<dataName<<'\n';
         cout<<"hasNull: "<<isNull<<'\n';
@@ -17,16 +17,16 @@ struct column{
     }
 };
 struct table{
-    string tablename="";
+    string tablename;
     column cols[30];
-    ll len=0;
+    ll len;
     void append(column ncol){cols[len++]=ncol;}
     void print(){cout<<tablename<<'\n'<<endl;for(ll i=0;i<len;i++)cols[i].print();}
     ll size(){ll otc=0;for(ll i=0;i<len;i++)otc+=cols[i].dsize;return otc;}
 };
 struct strlist{
     string str[30];
-    ll len=0;
+    ll len;
     void print(){for(ll i=0;i<len;i++)cout<<str[i]<<endl;}
     void append(string nstr){str[len++]=nstr;}
 };

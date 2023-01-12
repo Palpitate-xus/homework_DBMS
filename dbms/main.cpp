@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "dialog_login.h"
-#include "sql_parser.h"
-#include "TableManage.h"
 #include <QApplication>
 #include <iostream>
 using namespace std;
