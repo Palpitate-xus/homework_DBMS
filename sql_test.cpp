@@ -51,6 +51,11 @@ string parser(string sql)
             return sql.substr(13, sql.size() - 13);  // 返回数据库名称
         }
     }
+    else if(sql.substr(0, 4) == "view") {
+        cout << "view" << endl;
+        cout << sql.substr(5, sql.size() - 5) << endl;
+        return sql.substr(5, sql.size() - 5);  // 返回数据表名称
+    }
     else if(sql.substr(0, 6) == "create") {
         // create标准格式: create database [databasename]
         cout << "create" << endl;
@@ -92,6 +97,7 @@ string parser(string sql)
                 cols[i+1] = left_sql.substr(comma_pos[i] + 1, comma_pos[i+1] - comma_pos[i] - 1);
             }
             cols[comma_count] = left_sql.substr(comma_pos[comma_count-1] + 1, left_sql.size() - comma_pos[comma_count-1] - 2);
+            cout << cols[0] << endl;
         }
         // 可能会有索引 create index on [tablename]([cols])
         if (sql.substr(6, 13) == "index")
@@ -317,7 +323,7 @@ int main()
 {
     string sql_input;
     // cin >> sql_input;
-    // sql_input = "create table test {abc:efg,edf:gdsf,dsfsdf:dsfs}";
+    sql_input = "create table test {abc:efg,edf:gdsf,dsfsdf:dsfs}";
     // sql_input = "use database test";
     // sql_input = "create database test";
     // sql_input = "insert into test (column1,column2,column3,column4) values (value1,value2,value3,value4)";
@@ -326,7 +332,7 @@ int main()
     // sql_input = "delete table test";
     // sql_input = "select * from test where abc=efg or efg=def and opq=xyz";
     // sql_input = "update test set abc=efg where efg=def or opq=xyz and xyz=abc";
-    getline(cin, sql_input);
+    // getline(cin, sql_input);
     sql_input = sql_processor(sql_input);
     parser(sql_input);
     system("pause");

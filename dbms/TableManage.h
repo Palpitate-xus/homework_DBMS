@@ -1,16 +1,14 @@
-#include <iostream>
-#include <map>
-#include <string>
-#include <direct.h>
-#include <io.h>
-#include "DateType.h"
+#include<bits/stdc++.h>
+#include<direct.h>
+#include"DateType.h"
+#include"set.h"
 using namespace std;
-#define maxn 100010
 typedef int ll;
+const long long INF=0x8000000000000000;
 struct column{
-    bool isNull;
-    string dataType,dataName;
-    ll dsize;
+    bool isNull=0;
+    string dataType="",dataName="";
+    ll dsize=0;
     void print(){
         cout<<"ColumnName: "<<dataName<<'\n';
         cout<<"hasNull: "<<isNull<<'\n';
@@ -19,28 +17,18 @@ struct column{
     }
 };
 struct table{
+    string tablename="";
     column cols[30];
     ll len=0;
-    string tablename="";
     void append(column ncol){cols[len++]=ncol;}
     void print(){cout<<tablename<<'\n'<<endl;for(ll i=0;i<len;i++)cols[i].print();}
     ll size(){ll otc=0;for(ll i=0;i<len;i++)otc+=cols[i].dsize;return otc;}
 };
 struct strlist{
     string str[30];
-    int len = 0;
-    void print()
-    {
-        for(int i = 0; i < len; i++)
-        cout << str[i] << endl;
-    }
-    void append(string nstr)
-    {
-        str[len++] = nstr;
-    }
-};
-struct intlist{
-    //
+    ll len=0;
+    void print(){for(ll i=0;i<len;i++)cout<<str[i]<<endl;}
+    void append(string nstr){str[len++]=nstr;}
 };
 ll createDatabase(string DBname){
     if(!_access(DBname.c_str(),0))return 1;//database already exist
@@ -57,8 +45,8 @@ ll dropDatabase(string DBname){
     _rmdir(DBname.c_str());
     return 0;//success
 }
-ll createTable(string DBname,string Tablename,table tbl){
-    string filepath=DBname+"\\"+Tablename;
+ll createTable(string DBname,table tbl){
+    string filepath=DBname+"\\"+tbl.tablename;
     if(!_access((filepath+".stc").c_str(),0)||_access(DBname.c_str(),0))return 1;//table already exist or database not exist
     FILE*xx=fopen((filepath+".stc").c_str(),"wb");
     fwrite(&tbl.len,4,1,xx);
@@ -72,7 +60,7 @@ ll createTable(string DBname,string Tablename,table tbl){
     xx=fopen((filepath+".dt").c_str(),"wb");
     fclose(xx);
     xx=fopen((DBname+"\\tlist.lst").c_str(),"ab");
-    fwrite(Tablename.c_str(),15,1,xx);
+    fwrite(tbl.tablename.c_str(),15,1,xx);
     fclose(xx);
     return 0;//success
 }
@@ -99,9 +87,7 @@ strlist getTablenames(string DBname){
     return tbls;
 }
 table getTablestruction(string DBname,string Tablename){
-    string filepath=DBname+"\\"+Tablename+".stc";
-    table t;
-    t.tablename=Tablename;
+    string filepath=DBname+"\\"+Tablename+".stc";table t={Tablename};
     if(_access(filepath.c_str(),0))return t;//table not exist
     FILE*xx=fopen(filepath.c_str(),"rb");
     fread(&t.len,4,1,xx);
@@ -130,18 +116,27 @@ column setstring(string columnName,bool isNull,ll length){
 column setdate(string columnName,bool isNull){
     return {isNull,"date",columnName,12};
 }
+long long transint(string t){
+    if(t.length()>19||!t.length())return INF;
+    long long otc=0;
+    for(ll i=0;i<t.length();i++){
+        if(t[i]<48||t[i]>57)return INF;
+        otc=otc*10+t[i]-48;
+    }
+    return otc;
+}
 ll insert(string DBname,string Tablename,strlist values){
     string filepath=DBname+"\\"+Tablename;
     if(_access((filepath+".stc").c_str(),0))return 1;//table not exist
     table tbl=getTablestruction(DBname,Tablename);
-    FILE*xx=fopen((filepath+".dt").c_str(),"ab");
-    fseek(xx,0,2);ll size=ftell(xx);
     map<string,string>key;
     for(ll i=0;i<values.len;i++){
         string tem=values.str[i];ll pos=tem.find(' ',0);
         if(pos==-1)return 1;
         key[tem.substr(0,pos)]=tem.substr(pos+1,tem.length()-pos);
     }
+    FILE*xx=fopen((filepath+".dt").c_str(),"ab");
+    fseek(xx,0,2);ll size=ftell(xx);
     for(ll i=0;i<tbl.len;i++){
         column tem=tbl.cols[i];string str=key[tem.dataName];
         if(!tem.isNull&&str=="")goto l;//unexpected NULL value
@@ -152,12 +147,8 @@ ll insert(string DBname,string Tablename,strlist values){
             fwrite(&t,12,1,xx);
         }
         else{
-            ll len=str.length(),t=0;
-            if(len>19)goto l;//value string too long
-            for(ll i=0;i<len;i++){
-                if(str[i]<48||str[i]>57)goto l;//has not number characters
-                t=t*10+str[i]-48;
-            }
+            ll len=str.length();long long t=transint(str);
+            if(t==INF&&!tem.isNull)goto l;
             fwrite(&t,tem.dsize,1,xx);
         }
     }
@@ -166,15 +157,181 @@ ll insert(string DBname,string Tablename,strlist values){
     _chsize(_fileno(xx),size);//clear written data
     fclose(xx);return 1;
 }
+Chris*fetch(string DBname,string Tablename,strlist cstr,Chris*id){
+    string filepath=DBname+"\\"+Tablename;
+    if(_access((filepath+".stc").c_str(),0))return id;//table not exist
+    table tbl=getTablestruction(DBname,Tablename);ll size=tbl.size();
+    map<string,string>key;
+    for(ll i=0;i<cstr.len;i++){
+        string tem=cstr.str[i];ll pos=tem.find(' ',0);
+        if(pos==-1)return id;
+        key[tem.substr(0,pos)]=tem.substr(pos+1,tem.length()-pos);
+    }
+    FILE*xx=fopen((filepath+".dt").c_str(),"rb");
+    for(ll i=0,pos=0;i<tbl.len;pos+=tbl.cols[i++].dsize){
+        column tem=tbl.cols[i];if(!(id->size()))goto ends;
+        if(key['<'+tem.dataName]==""&&key["="+tem.dataName]==""&&key[">"+tem.dataName]=="")continue;
+        if(tem.dataType=="char"){
+            for(ll idx=id->kth(1);idx!=0x7FFFFFFF;idx=id->next(idx)){
+                fseek(xx,pos+idx*size,0);char t[tem.dsize+1]="";
+                fread(t,tem.dsize,1,xx);
+                string m=key['<'+tem.dataName],tstr=string(t);
+                if(m!=""&&tstr>=m)goto l1;
+                m=key['>'+tem.dataName];if(m!=""&&tstr>=m)goto l1;
+                m=key['='+tem.dataName];if(m!=""&&tstr!=m)goto l1;
+                continue;
+                l1:id->delet(idx);
+            }
+        }
+        else if(tem.dataType=="date"){
+            for(ll idx=id->kth(1);idx!=0x7FFFFFFF;idx=id->next(idx)){
+                fseek(xx,pos+idx*size,0);Date tdate;
+                fread(&tdate,12,1,xx);
+                Date m=Date(key['<'+tem.dataName].c_str());
+                if(m.year&&tdate>=m)goto l2;
+                m=Date(key['>'+tem.dataName].c_str());if(m.year&&tdate<=m)goto l2;
+                m=Date(key['='+tem.dataName].c_str());if(m.year&&tdate!=m)goto l2;
+                continue;
+                l2:id->delet(idx);
+            }
+        }
+        else{
+            for(ll idx=id->kth(1);idx!=0x7FFFFFFF;idx=id->next(idx)){
+                fseek(xx,pos+idx*size,0);long long tint=0;
+                fread(&tint,tem.dsize,1,xx);
+                long long m=transint(key['<'+tem.dataName]);
+                if(m!=INF&&tint>=m)goto l3;
+                m=transint(key['>'+tem.dataName]);if(m!=INF&&tint<=m)goto l3;
+                m=transint(key['='+tem.dataName]);
+                if(m!=INF&&tint!=m)goto l3;
+                continue;
+                l3:id->delet(idx);
+            }
+        }
+        if(!id->size())break;
+    }
+    ends:fclose(xx);
+    return id;
+}
 ll delet(string DBname,string Tablename,strlist cstr){
     string filepath=DBname+"\\"+Tablename;
     if(_access((filepath+".stc").c_str(),0))return 1;//table not exist
-    table tbl=getTablestruction(DBname,Tablename);ll size=tbl.size();
     FILE*xx=fopen((filepath+".dt").c_str(),"rb");
-    map<string,string>key;
-    while(1){
-        //
+    FILE*yy=fopen((filepath+".temp").c_str(),"wb");
+    fseek(xx,0,2);
+    table tbl=getTablestruction(DBname,Tablename);ll size=tbl.size(),rowct=ftell(xx)/size;
+    rewind(xx);
+    Chris*id=(Chris*)calloc(1,sizeof(Chris));
+    for(ll i=0;i<rowct;i++)id->insert(i);
+    id=fetch(DBname,Tablename,cstr,id);if(!(id->size()))goto end;//nothing to delete
+    for(ll i=0;i<rowct;i++){
+        if(id->has(i)){fseek(xx,size,1);continue;}
+        for(ll i=0;i<tbl.len;i++){
+            column tem=tbl.cols[i];
+            if(tem.dataType=="char"){
+                char tstr[tem.dsize+1]="";
+                fread(tstr,tem.dsize,1,xx);
+                fwrite(tstr,tem.dsize,1,yy);
+            }
+            else if(tem.dataType=="Date"){
+                Date tdate;
+                fread(&tdate,12,1,xx);
+                fwrite(&tdate,12,1,yy);
+            }
+            else{
+                long long tint=0;
+                fread(&tint,tem.dsize,1,xx);
+                fwrite(&tint,tem.dsize,1,yy);
+            }
+        }
     }
-    fclose(xx);
+    end:fclose(xx);fclose(yy);free(id);
+    remove((filepath+".dt").c_str());
+    rename((filepath+".temp").c_str(),(filepath+".dt").c_str());
     return 0;
+}
+vector<string> lookup(string DBname,string Tablename,strlist cstr,set<string>nonslc){
+    string filepath=DBname+"\\"+Tablename;vector<string>otc;
+    if(_access((filepath+".stc").c_str(),0))return otc;//table not exist
+    FILE*xx=fopen((filepath+".dt").c_str(),"rb");
+    fseek(xx,0,2);
+    table tbl=getTablestruction(DBname,Tablename);ll size=tbl.size(),rowct=ftell(xx)/size;
+    rewind(xx);
+    Chris*id=(Chris*)calloc(1,sizeof(Chris));
+    for(ll i=0;i<rowct;i++)id->insert(i);
+    id=fetch(DBname,Tablename,cstr,id);if(!(id->size()))goto end;//nothing to delete
+    for(ll idx=id->kth(1);idx!=0x7FFFFFFF;idx=id->next(idx)){
+        fseek(xx,idx*size,0);string ans="";
+        for(ll i=0;i<tbl.len;i++){
+            column tem=tbl.cols[i];
+            if(nonslc.count(tem.dataName)){fseek(xx,tem.dsize,1);continue;}
+            if(tem.dataType=="char"){
+                char tstr[tem.dsize+1]="";
+                fread(tstr,tem.dsize,1,xx);
+                ans+=string(tstr)+' ';
+            }
+            else if(tem.dataType=="date"){
+                Date tdate;
+                fread(&tdate,12,1,xx);
+                ans+=str(tdate)+' ';
+            }
+            else{
+                long long tint=0;
+                fread(&tint,tem.dsize,1,xx);
+                if(tint==INF)ans+="NULL ";
+                else ans+=transstr(tint)+' ';
+            }
+        }
+        otc.push_back(ans);
+    }
+    end:fclose(xx);free(id);
+    return otc;
+}
+vector<strlist> BreakDown(vector<string> logic){
+    vector<strlist>lgc;stack<string>con,log;
+    if(logic.size()==3){lgc.push_back({{*(logic.begin()+1)},1});return lgc;}
+    for(auto it=logic.cbegin();it!=logic.end();it++){
+        string tstr=*it;
+        if(tstr=="and"){
+            if(con.empty()||con.top()=="("||con.top()=="or"){con.push(tstr);continue;}
+            string nstr=log.top();log.pop();
+            if(lgc.empty()){
+                string nstr1=log.top();log.pop();
+                lgc.push_back({{nstr,nstr1},2});
+                continue;
+            }
+            for(auto it1=lgc.begin();it1!=lgc.end();it1++)(*it1).append(nstr);
+        }
+        else if(tstr=="or"){
+            if(con.empty()||con.top()=="("){con.push(tstr);continue;}
+            string tem=con.top();con.pop();con.push(tstr);
+            string nstr=log.top();log.pop();
+            if(lgc.empty()){
+                string nstr1=log.top();log.pop();
+                if(tem=="or")lgc.push_back({{nstr},1}),lgc.push_back({{nstr1},1});
+                else lgc.push_back({{nstr,nstr1},2});
+                continue;
+            }
+            if(tem=="or")lgc.push_back({{nstr},1});
+            else for(auto it1=lgc.begin();it1!=lgc.end();it1++)(*it1).append(nstr);
+        }
+        else if(tstr==")"){
+            while(con.top()!="("){
+                string tem=con.top();con.pop();
+                string nstr=log.top();log.pop();
+                if(lgc.empty()){
+                    string nstr1=log.top();log.pop();
+                    if(tem=="or")lgc.push_back({{nstr},1}),lgc.push_back({{nstr1},1});
+                    else lgc.push_back({{nstr,nstr1},2});
+                    continue;
+                }
+                if(tem=="or")lgc.push_back({{nstr},1});
+                else for(auto it1=lgc.begin();it1!=lgc.end();it1++)(*it1).append(nstr);
+            }
+            con.pop();
+        }
+        else if(tstr=="(")con.push("(");
+        else log.push(tstr);
+    }
+    return lgc;
 }

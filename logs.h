@@ -26,10 +26,3 @@ int log(string user, string operation, string time)
     oFile.close();
     return 0;
 }
-
-int main()
-{
-    getTime();
-    system("pause");
-    return 0;
-}

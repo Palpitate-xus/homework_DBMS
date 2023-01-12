@@ -45,8 +45,8 @@ ll dropDatabase(string DBname){
     _rmdir(DBname.c_str());
     return 0;//success
 }
-ll createTable(string DBname,string Tablename,table tbl){
-    string filepath=DBname+"\\"+Tablename;
+ll createTable(string DBname,table tbl){
+    string filepath=DBname+"\\"+tbl.tablename;
     if(!_access((filepath+".stc").c_str(),0)||_access(DBname.c_str(),0))return 1;//table already exist or database not exist
     FILE*xx=fopen((filepath+".stc").c_str(),"wb");
     fwrite(&tbl.len,4,1,xx);
@@ -60,7 +60,7 @@ ll createTable(string DBname,string Tablename,table tbl){
     xx=fopen((filepath+".dt").c_str(),"wb");
     fclose(xx);
     xx=fopen((DBname+"\\tlist.lst").c_str(),"ab");
-    fwrite(Tablename.c_str(),15,1,xx);
+    fwrite(tbl.tablename.c_str(),15,1,xx);
     fclose(xx);
     return 0;//success
 }
@@ -148,7 +148,7 @@ ll insert(string DBname,string Tablename,strlist values){
         }
         else{
             ll len=str.length();long long t=transint(str);
-            if(t==INF)goto l;
+            if(t==INF&&!tem.isNull)goto l;
             fwrite(&t,tem.dsize,1,xx);
         }
     }
@@ -250,7 +250,7 @@ ll delet(string DBname,string Tablename,strlist cstr){
     rename((filepath+".temp").c_str(),(filepath+".dt").c_str());
     return 0;
 }
-vector<string> lookup(string DBname,string Tablename,strlist cstr){
+vector<string> lookup(string DBname,string Tablename,strlist cstr,set<string>nonslc){
     string filepath=DBname+"\\"+Tablename;vector<string>otc;
     if(_access((filepath+".stc").c_str(),0))return otc;//table not exist
     FILE*xx=fopen((filepath+".dt").c_str(),"rb");
@@ -264,6 +264,7 @@ vector<string> lookup(string DBname,string Tablename,strlist cstr){
         fseek(xx,idx*size,0);string ans="";
         for(ll i=0;i<tbl.len;i++){
             column tem=tbl.cols[i];
+            if(nonslc.count(tem.dataName)){fseek(xx,tem.dsize,1);continue;}
             if(tem.dataType=="char"){
                 char tstr[tem.dsize+1]="";
                 fread(tstr,tem.dsize,1,xx);
@@ -277,7 +278,8 @@ vector<string> lookup(string DBname,string Tablename,strlist cstr){
             else{
                 long long tint=0;
                 fread(&tint,tem.dsize,1,xx);
-                ans+=transstr(tint)+' ';
+                if(tint==INF)ans+="NULL ";
+                else ans+=transstr(tint)+' ';
             }
         }
         otc.push_back(ans);
@@ -285,36 +287,51 @@ vector<string> lookup(string DBname,string Tablename,strlist cstr){
     end:fclose(xx);free(id);
     return otc;
 }
-int main(){
-    /*createDatabase("info");
-    table newt;
-    newt.append(setint("goodsCount",0,2));
-    newt.append(setstring("goodsName",0,15));
-    newt.append(setdate("saleDate",0));
-    createTable("info","goods",newt);*/
-    /*strlist nstr1,nstr2;
-    nstr1.append("goodsCount 15");
-    nstr1.append("goodsName earphones");
-    nstr1.append("saleDate 2020-08-19");
-    nstr2.append("goodsCount 24");
-    nstr2.append("goodsName kungpow chicken");
-    nstr2.append("saleDate 2023-01-10");
-    insert("info","goods",nstr1);insert("info","goods",nstr2);*/
-    /*FILE*xx=fopen("info\\goods.dt","rb");
-    while(1){
-        ll ct=0;char gn[16]="";Date sd;
-        fread(&ct,4,1,xx);
-        fread(gn,15,1,xx);
-        fread(&sd,12,1,xx);
-        if(feof(xx))break;
-        cout<<ct<<','<<gn<<','<<sd<<endl;
+vector<strlist> BreakDown(vector<string> logic){
+    vector<strlist>lgc;stack<string>con,log;
+    if(logic.size()==3){lgc.push_back({{*(logic.begin()+1)},1});return lgc;}
+    for(auto it=logic.cbegin();it!=logic.end();it++){
+        string tstr=*it;
+        if(tstr=="and"){
+            if(con.empty()||con.top()=="("||con.top()=="or"){con.push(tstr);continue;}
+            string nstr=log.top();log.pop();
+            if(lgc.empty()){
+                string nstr1=log.top();log.pop();
+                lgc.push_back({{nstr,nstr1},2});
+                continue;
+            }
+            for(auto it1=lgc.begin();it1!=lgc.end();it1++)(*it1).append(nstr);
+        }
+        else if(tstr=="or"){
+            if(con.empty()||con.top()=="("){con.push(tstr);continue;}
+            string tem=con.top();con.pop();con.push(tstr);
+            string nstr=log.top();log.pop();
+            if(lgc.empty()){
+                string nstr1=log.top();log.pop();
+                if(tem=="or")lgc.push_back({{nstr},1}),lgc.push_back({{nstr1},1});
+                else lgc.push_back({{nstr,nstr1},2});
+                continue;
+            }
+            if(tem=="or")lgc.push_back({{nstr},1});
+            else for(auto it1=lgc.begin();it1!=lgc.end();it1++)(*it1).append(nstr);
+        }
+        else if(tstr==")"){
+            while(con.top()!="("){
+                string tem=con.top();con.pop();
+                string nstr=log.top();log.pop();
+                if(lgc.empty()){
+                    string nstr1=log.top();log.pop();
+                    if(tem=="or")lgc.push_back({{nstr},1}),lgc.push_back({{nstr1},1});
+                    else lgc.push_back({{nstr,nstr1},2});
+                    continue;
+                }
+                if(tem=="or")lgc.push_back({{nstr},1});
+                else for(auto it1=lgc.begin();it1!=lgc.end();it1++)(*it1).append(nstr);
+            }
+            con.pop();
+        }
+        else if(tstr=="(")con.push("(");
+        else log.push(tstr);
     }
-    fclose(xx);*/
-    /*strlist tem;
-    tem.append("=goodsName earphones");
-    tem.append("<goodsCount 30");
-    delet("info","goods",tem);*/
-    strlist t={{""},0};t.append("=goodsCount 24");
-    vector<string>tem=lookup("info","goods",t);
-    for(auto it=tem.cbegin();it!=tem.cend();it++)cout<<*it<<endl;
+    return lgc;
 }

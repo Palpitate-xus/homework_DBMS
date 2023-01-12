@@ -322,7 +322,7 @@ int main()
 {
     string sql_input;
     // cin >> sql_input;
-    // sql_input = "create table test {abc:efg,edf:gdsf,dsfsdf:dsfs}";
+    sql_input = "create table test {abc:efg,edf:gdsf,dsfsdf:dsfs}";
     // sql_input = "use database test";
     // sql_input = "create database test";
     // sql_input = "insert into test (column1,column2,column3,column4) values (value1,value2,value3,value4)";
@@ -331,7 +331,7 @@ int main()
     // sql_input = "delete table test";
     // sql_input = "select * from test where abc=efg or efg=def and opq=xyz";
     // sql_input = "update test set abc=efg where efg=def or opq=xyz and xyz=abc";
-    getline(cin, sql_input);
+    // getline(cin, sql_input);
     sql_input = sql_processor(sql_input);
     parser(sql_input);
     system("pause");

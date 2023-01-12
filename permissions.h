@@ -62,59 +62,22 @@ int permissionQuery(string username)
         {
             if (users[i].permission == "admin")
             {
-                cout << "permission: admin" << endl;
                 return 1;
             }
             else if (users[i].permission == "user")
             {
-                cout << "permission: user" << endl;
                 return 0;
             }
         }
     }
+    return -1;
 }
 
 // 创建用户
 int createUser(user new_user)
 {
     fstream fs("user.dat", ios::binary | ios::out | ios::app);
-    fs << new_user.username << " " << new_user.password << " " << new_user.permission << endl;
+    fs << '\n' << new_user.username << " " << new_user.password << " " << new_user.permission << endl;
     fs.close();
     return 0;
-}
-
-int main ()
-{
-//    ofstream outfile;
-//    outfile.open("user.dat");
-//    cin.getline(data, 100);
-
-//    outfile << data << endl;
- 
-//    cout << "Enter your age: "; 
-//    cin >> data;
-//    cin.ignore();
-   
-//    outfile << data << endl;
- 
-//    outfile.close();
- 
-   // 以读模式打开文件
-//    ifstream infile; 
-//    infile.open("user.dat"); 
- 
-//    cout << "Reading from the file" << endl; 
-//    infile >> data; 
- 
-   // 在屏幕上写入数据
-//    cout << data << endl;
-   
-   // 关闭打开的文件
-//    infile.close();
-    if (login("xus", "xus"))
-    {
-        permissionQuery("xus");
-    }
-    system("pause");
-   return 0;
 }
